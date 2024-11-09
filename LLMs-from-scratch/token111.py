@@ -14,7 +14,7 @@ if not os.path.exists("the-verdict.txt"):
     urllib.request.urlretrieve(url, file_path)
     
     
-with open("/home/wangkai/LLM_learning/LLMs-from-scratch/the-verdict.txt","r",encoding="utf-8") as f:
+with open("/home/wk/LLM_learning/LLMs-from-scratch/the-verdict.txt","r",encoding="utf-8") as f:
        raw_text = f.read()
 
 print("Total number of character:", len(raw_text))
@@ -36,7 +36,7 @@ class GPTDatesetV1(Dataset):
               #Use a sliding window to chunk the book into overlapping sequences of max_length
               for i in range(0,len(token_ids)-max_length,stride):
                      input_chunk = token_ids[i:i+max_length]
-                     target_chunk = token_ids[i+1,i+max_length+1]
+                     target_chunk = token_ids[i+1:i+max_length+1]
                      self.input_ids.append(torch.tensor(input_chunk))
                      self.target_dis.append(torch.tensor(target_chunk))
        
@@ -63,3 +63,33 @@ def create_dataloader_v1(txt, batch_size=4, max_length=256, stride=128, shuffle 
               num_workers=num_workers
        )
        return dataloader
+
+
+dataloader = create_dataloader_v1(
+    raw_text, batch_size=1, max_length=4, stride=1, shuffle=False
+)
+
+data_iter = iter(dataloader)
+first_batch = next(data_iter)
+print(first_batch)
+
+second_batch = next(data_iter)
+print(second_batch)
+
+dataloader = create_dataloader_v1(
+       raw_text,batch_size=8,max_length=4,stride=1,shuffle=False
+)
+data_iter = iter(dataloader)
+inputs,targets = next(data_iter)
+print("Inputs:/n", inputs)
+print("\n Targets:\n",targets)
+
+
+input_ids = torch.tensor([2,3,5,1])
+vocab_size = 6
+output_dim = 3
+torch.manual_seed(123)
+embedding_layer = torch.nn.Embedding(vocab_size,output_dim)
+print(embedding_layer.weight)
+
+
