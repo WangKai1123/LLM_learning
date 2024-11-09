@@ -36,3 +36,30 @@ def softmax_native(x):
     return torch.exp(x) / torch.exp(x).sum(dim=0)
 
 atten_weights_2_native = softmax_native(atten_score_2)
+
+
+#normalization softmax by pytorch
+atten_weights_2 = torch.softmax(atten_score_2,dim=0)
+
+#compute the contecxt vector  by multiplying the embedded input tokens with the attention weights and sum th
+#resulting vector
+query  =inputs[1]
+context_vec_2 = torch.zeros(query.shape)
+for i ,x_i in enumerate(inputs):
+    context_vec_2 += atten_weights_2[i]*x_i
+print(context_vec_2)
+
+
+
+#Generalize to all input sequence tokens
+attn_scores = torch.empty(6,6)
+
+for i, x_i in enumerate(inputs):
+    for j, x_j in enumerate(inputs):
+        attn_scores[i,j] = torch.dot(x_i, x_j)
+# more efficiently via matrix multiplication
+attn_scores = inputs @ inputs.T
+#softmax
+attn_weights = torch.softmax(attn_scores, dim=-1) 
+
+all_context_vecs = attn_weights @ inputs

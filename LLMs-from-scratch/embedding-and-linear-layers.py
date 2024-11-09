@@ -17,7 +17,7 @@ print(embedding.weight)
 
 
 
-#Using nn.Linear
+#Using nn.Linear 
 #convert token IDS into a one-hot representation
 onehot = torch.nn.functional.one_hot(idx)
 print(onehot)
