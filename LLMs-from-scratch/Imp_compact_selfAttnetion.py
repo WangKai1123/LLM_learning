@@ -94,3 +94,41 @@ print(dropout(example))
 
 torch.manual_seed(123)
 print(dropout(attn_weights))
+
+#implementing a compact causal self-attention
+batch=torch.stack((inputs, inputs),dim=0)
+#batch shape = [2,6,3]
+class CausalAttention(nn.Module):
+    def __init__(self, d_in,d_out,context_length,dropout, qkv_bias=False):
+        super().__init__()
+        self.d_out = d_out
+        self.w_query = nn.Linear(d_in, d_out,bias=qkv_bias)
+        self.w_key = nn.Linear(d_in, d_out,bias=qkv_bias)
+        self.w_value = nn.Linear(d_in, d_out,bias=qkv_bias)
+        self.dropout = nn.Dropout(dropout)
+        self.register_buffer('mask', torch.triu(torch.ones(context_length,context_length)))
+
+    def forward(self,x):
+        b, num_tokens, d_in = x.shape
+        keys = self.w_key(x)
+        queries = self.w_query(x)
+        values = self.w_value(x)
+
+        attn_scores = queries @ keys.transpose(1,2)
+        attn_scores.masked_fill_(
+            self.mask.bool()[:num_tokens,:num_tokens], -torch.inf
+        )
+        attn_weights = self.dropout(attn_weights)
+
+        context_vec = attn_weights @ values
+        return context_vec
+torch.manual_seed(123)
+context_length = batch.shape[1]
+ca = CausalAttention(d_in,d_out,context_length,0.0)
+context_vecs = ca(batch)
+print(context_vecs)
+print("context_vecs.shape:", context_vecs.shape)
+
+
+
+
