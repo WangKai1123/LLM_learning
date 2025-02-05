@@ -2,3 +2,5 @@
 LLMs-from-scratch/gpt2/*
 */gpt2/
 LLMs-from-scratch/gpt2/124M/model.ckpt.data-00000-of-00001
+*.pdf
+*.pth
